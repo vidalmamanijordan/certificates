@@ -79,23 +79,28 @@ const buscarCertificados = async () => {
         </button>
       </div>
 
-      <!-- Botón buscar -->
+      <!-- Botón buscar amarillo sólido con icono de lupa -->
       <button
         @click="buscarCertificados"
-        class="bg-blue-600 hover:bg-blue-700 px-4 py-3 rounded-r-lg flex items-center justify-center transition-colors"
+        class="bg-yellow-400 text-white px-4 py-3 rounded-r-lg flex items-center justify-center shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5 text-white"
+          class="h-6 w-6 text-white"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
-          stroke-width="2"
+          stroke-width="2.5"
         >
-          <path
+          <!-- Icono clásico de lupa -->
+          <circle cx="11" cy="11" r="7" stroke-linecap="round" stroke-linejoin="round" />
+          <line
+            x1="16.5"
+            y1="16.5"
+            x2="21"
+            y2="21"
             stroke-linecap="round"
             stroke-linejoin="round"
-            d="M21 21l-4.35-4.35M16.65 16.65A7.5 7.5 0 1116.65 2a7.5 7.5 0 010 14.65z"
           />
         </svg>
       </button>
