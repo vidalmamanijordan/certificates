@@ -12,7 +12,7 @@
     "preview": "vite preview",
     "lint": "eslint . --fix --cache",
     "format": "prettier --write src/",
-    "deploy": "vite build && gh-pages -d dist"
+    "deploy": "vite build && npx gh-pages -d dist --repo=https://github.com/vidalmamanijordan/certificates.git"
   },
   "dependencies": {
     "axios": "^1.13.2",
