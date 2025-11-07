@@ -1,67 +1,128 @@
 <template>
-  <div
-    v-if="visible"
-    class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-  >
-    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg text-gray-800">
-      <h2 class="text-2xl font-bold mb-2 text-center">Resultados</h2>
-
-      <!-- 👤 Nombre del participante -->
-      <p
-        v-if="certificados.length"
-        class="text-left text-lg font-bold bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-400 bg-clip-text text-transparent mb-5 leading-snug tracking-wide"
+  <transition name="fade-zoom" appear>
+    <div
+      v-if="visible"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+    >
+      <div
+        class="relative bg-white rounded-2xl shadow-2xl p-5 w-full max-w-md text-gray-800 transform transition-all duration-300 border border-blue-100 hover:border-blue-300 hover:shadow-blue-100/70"
       >
-        {{ certificados[0].full_names }}
-      </p>
-
-      <!-- 🔍 Campo de búsqueda -->
-      <div class="mb-4">
-        <input
-          v-model="searchTerm"
-          type="text"
-          placeholder="Buscar por nombre del evento o fecha..."
-          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-
-      <!-- 📋 Lista filtrada -->
-      <div v-if="filteredCertificados.length">
-        <ul class="space-y-3">
-          <li
-            v-for="(cert, index) in filteredCertificados"
-            :key="index"
-            class="border p-3 rounded-lg hover:bg-gray-50 transition"
-          >
-            <p><strong>Evento:</strong> {{ cert.event }}</p>
-            <p><strong>Código:</strong> {{ cert.certificate_code }}</p>
-            <p><strong>Fecha:</strong> {{ cert.date }}</p>
-            <p><strong>DNI:</strong> {{ cert.dni }}</p>
-            <p>
-              <strong>Ver certificado:</strong>
-              <a :href="cert.url" target="_blank" class="text-blue-600 underline">
-                Abrir enlace
-              </a>
-            </p>
-          </li>
-        </ul>
-      </div>
-
-      <div v-else class="text-center text-gray-500">No se encontraron resultados</div>
-
-      <div class="mt-6 text-center">
+        <!-- ❌ Botón de cerrar -->
         <button
           @click="$emit('close')"
-          class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg"
+          class="absolute -top-3 -left-3 w-7 h-7 flex items-center justify-center rounded-full bg-blue-500 text-white shadow-md hover:shadow-lg hover:bg-blue-600 transition-all duration-300 hover:rotate-90 focus:outline-none focus:ring-2 focus:ring-blue-300"
         >
-          Cerrar
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
         </button>
+
+        <h2 class="text-xl font-bold mb-3 text-center text-gray-800">Resultados</h2>
+
+        <!-- 👤 Nombre del participante -->
+        <p
+          v-if="certificados.length"
+          class="text-center text-base font-semibold bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-400 bg-clip-text text-transparent mb-4 leading-snug tracking-wide"
+        >
+          {{ certificados[0].full_names }}
+        </p>
+
+        <!-- 🔍 Campo de búsqueda -->
+        <div class="mb-3">
+          <input
+            v-model="searchTerm"
+            type="text"
+            placeholder="Buscar por evento o fecha..."
+            class="w-full border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 text-sm"
+          />
+        </div>
+
+        <!-- 📋 Lista paginada -->
+        <div v-if="paginatedCertificados.length">
+          <ul class="space-y-2">
+            <li
+              v-for="(cert, index) in paginatedCertificados"
+              :key="index"
+              class="border border-gray-200 p-3 rounded-xl bg-gradient-to-r from-gray-50 to-white shadow-sm transform transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-lg hover:-translate-y-1 hover:border-blue-400 hover:bg-gradient-to-r hover:from-blue-50 hover:to-white text-sm"
+            >
+              <p><strong>Código:</strong> {{ cert.certificate_code }}</p>
+              <p><strong>Evento:</strong> {{ cert.event }}</p>
+              <p><strong>Fecha:</strong> {{ cert.date }}</p>
+              <p><strong>Participación:</strong> {{ cert.type }}</p>
+
+              <!-- 🏅 Botón “Ver certificado” actualizado -->
+              <div class="flex items-center justify-between mt-3">
+                <strong class="text-gray-700">Ver certificado:</strong>
+                <a
+                  :href="cert.url"
+                  target="_blank"
+                  class="group flex items-center gap-2 bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md hover:shadow-lg hover:scale-105 hover:from-yellow-500 hover:to-amber-600 transition-all duration-300"
+                >
+                  <Award
+                    class="w-4 h-4 text-white transition-transform duration-300 group-hover:rotate-6"
+                  />
+                  <span class="tracking-wide">Ver</span>
+                </a>
+              </div>
+            </li>
+          </ul>
+
+          <!-- 📄 Controles de paginación -->
+          <div class="flex justify-end items-center gap-2 mt-4 text-xs">
+            <button
+              @click="prevPage"
+              :disabled="currentPage === 1"
+              class="flex items-center justify-center w-7 h-7 rounded-full border border-gray-300 bg-white text-gray-600 hover:bg-blue-100 hover:text-blue-600 disabled:opacity-40 transition"
+            >
+              <ChevronLeft class="w-4 h-4" />
+            </button>
+
+            <span class="text-gray-700 font-medium">
+              {{ currentPage }} / {{ totalPages }}
+            </span>
+
+            <button
+              @click="nextPage"
+              :disabled="currentPage === totalPages"
+              class="flex items-center justify-center w-7 h-7 rounded-full border border-gray-300 bg-white text-gray-600 hover:bg-blue-100 hover:text-blue-600 disabled:opacity-40 transition"
+            >
+              <ChevronRight class="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        <div v-else class="text-center text-gray-500 mt-4 text-sm">
+          No se encontraron resultados
+        </div>
+
+        <!-- 🔘 Botón cerrar -->
+        <div class="mt-5 text-center">
+          <button
+            @click="$emit('close')"
+            class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-1.5 rounded-lg shadow-md transition-all duration-300 hover:scale-105 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+          >
+            Cerrar
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
+import { ChevronLeft, ChevronRight, Award } from "lucide-vue-next";
 
 const props = defineProps({
   visible: Boolean,
@@ -69,12 +130,11 @@ const props = defineProps({
 });
 
 const searchTerm = ref("");
+const currentPage = ref(1);
+const itemsPerPage = 2;
 
-// 🔎 Filtra y ordena los certificados (más recientes primero)
 const filteredCertificados = computed(() => {
   let certificados = [...props.certificados];
-
-  // Filtrado por evento o fecha
   if (searchTerm.value.trim()) {
     const term = searchTerm.value.toLowerCase();
     certificados = certificados.filter(
@@ -82,12 +142,36 @@ const filteredCertificados = computed(() => {
         cert.event.toLowerCase().includes(term) || cert.date.toLowerCase().includes(term)
     );
   }
-
-  // 🕒 Ordenar por fecha descendente (más recientes primero)
-  return certificados.sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
-    return dateB - dateA;
-  });
+  return certificados.sort((a, b) => new Date(b.date) - new Date(a.date));
 });
+
+const totalPages = computed(() =>
+  Math.ceil(filteredCertificados.value.length / itemsPerPage)
+);
+
+const paginatedCertificados = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  return filteredCertificados.value.slice(start, start + itemsPerPage);
+});
+
+watch(searchTerm, () => (currentPage.value = 1));
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) currentPage.value++;
+};
+const prevPage = () => {
+  if (currentPage.value > 1) currentPage.value--;
+};
 </script>
+
+<style scoped>
+.fade-zoom-enter-active,
+.fade-zoom-leave-active {
+  transition: all 0.3s ease;
+}
+.fade-zoom-enter-from,
+.fade-zoom-leave-to {
+  opacity: 0;
+  transform: scale(0.9);
+}
+</style>
