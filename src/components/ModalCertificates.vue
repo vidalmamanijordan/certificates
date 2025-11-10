@@ -59,7 +59,7 @@
               <p><strong>Participación:</strong> {{ cert.type }}</p>
 
               <div class="flex items-center justify-between mt-3">
-                <strong class="text-gray-700">Ver certificado:</strong>
+                <strong class="text-gray-700">Certificado:</strong>
                 <a
                   :href="cert.url"
                   target="_blank"

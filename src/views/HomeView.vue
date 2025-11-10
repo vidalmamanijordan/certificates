@@ -96,6 +96,7 @@ const buscarCertificados = async () => {
             type="text"
             v-model="dni"
             placeholder="Ingrese su DNI o Código"
+            @keyup.enter="buscarCertificados"
             class="w-full px-4 py-3 rounded-l-xl border border-transparent text-gray-800 pr-10 bg-white/90 backdrop-blur-sm shadow-sm hover:border-yellow-400 focus:border-yellow-400 focus:outline-none focus:ring-0 transition-all duration-300 ease-out"
           />
           <button
