@@ -32,7 +32,7 @@
 
         <p
           v-if="certificados.length"
-          class="text-center text-base font-semibold bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-400 bg-clip-text text-transparent mb-4 leading-snug tracking-wide"
+          class="text-center text-2xl font-semibold bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-400 bg-clip-text text-transparent mb-4 leading-snug tracking-wide"
         >
           {{ certificados[0].full_names }}
         </p>
@@ -56,7 +56,23 @@
               <p><strong>Código:</strong> {{ cert.certificate_code }}</p>
               <p><strong>Evento:</strong> {{ cert.event }}</p>
               <p><strong>Fecha:</strong> {{ cert.date }}</p>
-              <p><strong>Participación:</strong> {{ cert.type }}</p>
+              <p>
+                <strong>Participación:&nbsp;</strong>
+                <span
+                  :class="[
+                    'px-2 py-0.5 rounded-full text-white text-xs font-semibold transition-all duration-300',
+                    cert.type.toLowerCase() === 'organizador'
+                      ? 'bg-yellow-500 hover:bg-yellow-600'
+                      : cert.type.toLowerCase() === 'ponente'
+                      ? 'bg-blue-500 hover:bg-blue-600'
+                      : cert.type.toLowerCase() === 'asistente'
+                      ? 'bg-green-500 hover:bg-green-600'
+                      : '',
+                  ]"
+                >
+                  {{ cert.type }}
+                </span>
+              </p>
 
               <div class="flex items-center justify-between mt-3">
                 <strong class="text-gray-700">Certificado:</strong>
